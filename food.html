@@ -1,0 +1,147 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="foodStyle.css">
+    <title>Market</title>
+</head>
+
+<body>
+    <header>
+        <img src="https://secretmenus.com/wp-content/uploads/2017/12/hannaford.png" alt="logo" height="60px">
+    </header>
+    <main class="market">
+        <section class="menu">
+            <h2>Каталог</h2>
+
+        </section>
+        <section class="basket">
+            <h2>Корзина</h2>
+            <div class="tovar">
+
+            </div>
+            <div class="sum"><span>Итого: </span><span class="itog">0</span><span> руб.</span></div>
+        </section>
+
+        <template id="to_menu">
+            <div class="item">
+                <img height="100px">
+                <div class="item_name"></div>
+                <div class="price_cont"><span class="price"></span><span> руб.</span></div>
+                <br>
+                <div class="but"><button class="add_to">Добавить в корзину</button></div>
+            </div>
+        </template>
+
+        <template id="to_basket">
+            <div class="item">
+                <img height="100px">
+                <div class="item_name"></div>
+                <div class="price_cont"><span class="price"></span><span> руб.</span></div><input class="count"
+                    value="1" type="number" min="1" max="100" step="1">
+                <br>
+                <div class="but"><button class="del_to">Удалить</button></div>
+            </div>
+        </template>
+
+    </main>
+
+    <script>
+        let products = [{
+                src: "https://avatars.mds.yandex.net/get-pdb/1590269/c41a7bfd-5ca1-48a1-a6d1-30b6c41f03a7/s1200",
+                name: "Морковь, кг",
+                price: 20
+            },
+            {
+                src: "https://freedesignresources.net/wp-content/uploads/2017/06/Mockupground_free-psd-milk-box-mockup_170617_prev01.jpg",
+                name: "Молоко",
+                price: 60
+            },
+            {
+                src: "https://nepszava.hu/i/9/9/0/1247324.jpg",
+                name: "Яблоки, кг",
+                price: 95
+            },
+            {
+                src: "https://coffee52.ru/upload/iblock/297/2976f2d0789329e8d1b780a642002acf.jpg",
+                name: "Красная икра, 100гр",
+                price: 300
+            },
+            {
+                src: "https://avatars.mds.yandex.net/get-marketpic/1592727/market_iXbFcwlRCdfjAd5QOuDh7Q/900x1200",
+                name: "Масло сливочное",
+                price: 120
+            },
+            {
+                src: "https://clip.cookdiary.net/sites/default/files/wallpaper/bread-roll-clipart/455015/bread-roll-clipart-gambar-455015-5251956.png",
+                name: "Хлеб",
+                price: 30
+            }
+        ];
+        let basket = [];
+
+        let toMenu = document.querySelector('#to_menu').content.querySelector('.item');
+        let toBasket = document.querySelector('#to_basket').content.querySelector('.item');
+        let total = document.querySelector('.itog');
+
+
+        for (let i = 0; i < products.length; i++) {
+            createFood(products[i], toMenu, document.querySelector('.menu'), (f) => {
+                f.querySelector('.add_to').onclick = () => {
+
+                    let found = basket.filter(b => b.prod === products[i])[0];
+
+                    if (found != undefined) {
+                        found.count++;
+                        let indexFound = basket.indexOf(found);
+                        document.querySelector('.tovar').querySelectorAll(`.item`)[indexFound]
+                            .querySelector('.count').value = found.count;
+                        setItogo();
+
+                    } else {
+                        let pr = {
+                            prod: products[i],
+                            count: 1
+                        };
+                        basket.push(pr);
+                        setItogo();
+                        createFood(pr.prod, toBasket, document.querySelector('.tovar'), (fo) => {
+                            fo.querySelector('.del_to').onclick = () => {
+                                fo.remove();
+                                let ind = basket.indexOf(pr);
+                                basket.splice(ind, 1);
+                                console.log(basket);
+                                setItogo();
+                            }
+
+                            fo.querySelector('.count').onchange = () => {
+                                pr.count = fo.querySelector('.count').value;
+                                setItogo();
+                            }
+                        });
+                    }
+                }
+            })
+        }
+
+        function setItogo() {
+            let summ = 0;
+            for (let i = 0; i < basket.length; i++) {
+                summ += basket[i].prod.price * basket[i].count;
+            }
+            total.textContent = summ;
+        }
+
+        function createFood(product, temp, to, func) {
+            let food = temp.cloneNode(true);
+            food.querySelector('.item_name').textContent = product.name;
+            food.querySelector('.price').textContent = product.price;
+            food.querySelector('img').src = product.src;
+            to.appendChild(food);
+            if (func) {
+                func(food);
+            }
+        }
+    </script>
+</body>
+
+</html>
